@@ -89,5 +89,5 @@ This section comprises train and test functions that does the training and valid
 ## 6. Run the model with a device and an optimizer
 This section contains code to run the model to get trained using a device that is GPU and an optimizer that is SGD(Stochastic Gradient Descent).
 
-On epoch 12, validation accuracy is 99.43 %
+On epoch 12, validation accuracy is 99.43 %  
 On epoch 17, validation accuracy is 99.50 %

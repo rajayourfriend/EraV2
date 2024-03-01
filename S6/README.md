@@ -1,6 +1,8 @@
 
 # PART-1
 
+My results in excel file does not match with the one available in the video, hence not submitting it now.
+
 # PART-2
 
 ### How many layers ?
@@ -66,3 +68,26 @@ Answer : More the batch size, better the network performance is. But after some 
 
 
 # PART-3
+
+## 1. Import external libraries
+This section does import of external libraries that are used in the present file ToSubmit_04_EraV2_S6.ipynb, such as pytorch, etc.
+
+
+## 2. Convolutional Neural Network (model) architecture
+This section does the preparation of model alias network that has several layers such as convolution, maxpool, batch normalization, dropout, etc. In the function forward, input x is fed to conv1 layer first and then passed through an activation layer of relu. The output is fed to batch normalization process. After passing another set of conv (2), relu, batch_norm, the output is fed to a maxpool layer. This is followed in the same way to reach another maxpool layer. After that output is fed to conv (7) layer. From this, the output is fed to pytorch view function that does reshape of dimension to 1x10 that is the final output layer.
+
+
+## 3. Display summary of model
+This section gets and displays the summary of the model along with the number of parameters used in the model, layerwise. Total number of parameters are 13422.
+
+## 4. Preparation of dataset
+This section prepares the dataset of MNIST (Modified National Institute of Standards and Technology) from pytorch that is nothing but images of handwritten numbers 0 to 9.
+
+## 5. Train and Test Functions
+This section comprises train and test functions that does the training and validation required by the model to get trained and finally get validated.
+
+## 6. Run the model with a device and an optimizer
+This section contains code to run the model to get trained using a device that is GPU and an optimizer that is SGD(Stochastic Gradient Descent).
+
+On epoch 12, validation accuracy is 99.43 %
+On epoch 17, validation accuracy is 99.50 %

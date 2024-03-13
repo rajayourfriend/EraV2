@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 class Net4(nn.Module):
     def __init__(self):
-        super(Net, self).__init__()
+        super(Net4, self).__init__()
         set1 = 8 #channels
         set2 = 16 #channels
         out = 10 #channels

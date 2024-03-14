@@ -11,7 +11,7 @@ class Net4(nn.Module):
         set2 = 10 #channels
         out = 10 #channels
         avg = 7 #channels
-        drop = 0.25 #dropout
+        drop = 0.3 #dropout
         mom = 0.1 #momentum in bn
         self.conv1 = nn.Conv2d(1, set1, 3, padding=1)
         self.bn1 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)

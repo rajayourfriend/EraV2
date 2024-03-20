@@ -11,7 +11,64 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-## For S8 of EraV2
+## For S8 of EraV2 - Group Normalization
+
+
+
+class Net_GN_S8(nn.Module):
+    def __init__(self):
+        super(Net_GN_S8, self).__init__()
+        set1 = 16 #channels
+        set2 = 32 #channels
+        out = 10 #channels
+        avg = 5 #channels
+        drop = 0.25 #dropout
+        mom = 0.1
+        self.conv1 = nn.Conv2d(3, set1, 3, padding=1) #first 3 => input channels(R,G,B) last 3 => kernel size (3x3)
+        self.gn1 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.conv2 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.gn2 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.conv3 = nn.Conv2d(set1, set1, 1, padding=1)
+        self.gn3 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.pool1 = nn.MaxPool2d(2, 2)
+
+        self.conv4 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.gn4 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.conv5 = nn.Conv2d(set1, set2, 3, padding=1)
+        self.gn5 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv6 = nn.Conv2d(set2, set2, 3)
+        self.gn6 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv7 = nn.Conv2d(set2, set2, 1)
+        self.gn7 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.pool2 = nn.MaxPool2d(2, 2)
+
+        self.conv8 = nn.Conv2d(set2, set2, 3)
+        self.gn8 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv9 = nn.Conv2d(set2, set2, 3)
+        self.gn9 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv10 = nn.Conv2d(set2, out, 3)
+        self.gn10 = nn.GroupNorm(num_groups=1, num_channels=out)
+
+        self.gap = nn.AvgPool2d(kernel_size=[avg,avg], stride=[avg,avg], padding=0, ceil_mode=False, count_include_pad=False)
+        self.conv11 = nn.Conv2d(out, out, 1)
+
+
+        self.drop = nn.Dropout(drop)
+
+    def forward(self, x):
+        x = self.pool1(self.gn3(F.relu(self.conv3(self.gn2(F.relu(self.conv2(self.gn1(F.relu(self.conv1(x))))))))))
+        x = self.pool2(self.gn7(F.relu(self.conv7(self.gn6(F.relu(self.conv6(self.gn5(F.relu(self.conv5(self.gn4(F.relu(self.conv4(x)))))))))))))
+        x = self.gn10(F.relu(self.conv10(self.gn9(F.relu(self.conv9((self.gn8(F.relu(self.conv8(x))))))))))
+        #print(x.shape)
+        x = self.conv11(x)
+        #print(x.shape)
+        #x = self.gap(x)
+        #print(x.shape)
+        x = x.view(-1, 10) # Raja ToDo Try printing shape here
+        return F.log_softmax(x)
+
+
+## For S8 of EraV2 - Layer Normalization
 
 class Net_LN_S8(nn.Module):
     @staticmethod

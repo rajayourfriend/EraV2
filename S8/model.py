@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms, utils
 from torch.optim.lr_scheduler import StepLR
-%matplotlib inline
+
 import matplotlib.pyplot as plt
 import numpy as np
 

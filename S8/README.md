@@ -1,5 +1,5 @@
 
-# Input Data 
+## Input Dataset
 
 CIFAR10
 

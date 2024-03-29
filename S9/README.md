@@ -10,9 +10,9 @@ CIFAR10
 
 ### Number of Epochs 
 
-on th epoch
+on the 14 epoch
 
 ### Accuracy info 
 
-train_cc = %
-test_acc = %
+train_cc = 82.94%
+test_acc = 85.03%

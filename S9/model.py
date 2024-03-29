@@ -1,0 +1,435 @@
+
+from __future__ import print_function
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torchvision import datasets, transforms, utils
+from torch.optim.lr_scheduler import StepLR
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+
+## For S9 of EraV2 - Advanced Conv : DepthwiseSeparable & Dilated 
+
+class Net_S9(nn.Module):
+    def __init__(self):
+        super(Net_S9, self).__init__()
+
+        self.printShape = False
+
+        #C1 :-
+        set1 = set2 = set3 = set4 = 32 #channels
+        set1 = set2 = set3 = set4 = 64 #channels
+
+        out = 10 #channels
+        avg = 11 #channels
+        avg = 11 #channels
+        drop = 0.1 #dropout
+        stride = 1
+        in_channels = 3
+        out_channels = set1
+        p = 1 #padding
+        self.depsep1 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+
+        in_channels = set1
+        out_channels = set1
+        self.depsep2 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+        # in_channels = set1
+        # out_channels = set1
+        self.dila1 = nn.Conv2d(in_channels, out_channels, 3, padding=p, dilation = 2)
+        self.bridge1 = nn.Conv2d(in_channels, out_channels, 3, padding=p, stride = 2)
+
+        #C2 :-
+        in_channels = set1
+        out_channels = set2
+        self.depsep3 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+
+        in_channels = set2
+        # out_channels = set2
+        self.depsep4 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+        # in_channels = set2
+        # out_channels = set2
+        self.dila2 = nn.Conv2d(in_channels, out_channels, 3, padding=p, dilation = 2)
+        self.bridge2 = nn.Conv2d(in_channels, out_channels, 3, padding=p, stride = 2)
+
+        #C3 :-
+        in_channels = set2
+        out_channels = set3
+        self.depsep5 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+
+        in_channels = set3
+        # out_channels = set3
+        self.depsep6 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+        # in_channels = set3
+        # out_channels = set3
+        self.dila3 = nn.Conv2d(in_channels, out_channels, 3, padding=p, dilation = 2)
+        self.bridge3 = nn.Conv2d(in_channels, out_channels, 3, padding=p, stride = 2)
+
+        #C4 :-
+        in_channels = set3
+        out_channels = set4
+        self.depsep7 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+        in_channels = set4
+        # out_channels = set4
+        self.depsep8 = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p)
+
+        in_channels = set4
+        out_channels = out
+        self.lastConvLayer = self.depSepConv(in_channels = in_channels, out_channels = out_channels, kernel_size = 3, stride = stride, padding = p, lastLayer = True)
+
+        self.gap = nn.AvgPool2d(avg)
+        self.drop = nn.Dropout(drop)
+
+    # Depthwise Separable Convolution
+    def depSepConv(self, in_channels, out_channels, kernel_size, stride = 1, padding = 0, lastLayer = False, bias = False):
+      if(False == lastLayer):
+        return nn.Sequential(
+            nn.Conv2d(in_channels = in_channels, out_channels = in_channels, stride = stride, padding = padding, kernel_size = kernel_size, groups=in_channels, bias = bias),
+            nn.BatchNorm2d(in_channels), nn.ReLU(),
+            nn.Conv2d(in_channels = in_channels , out_channels = out_channels, stride = 1, padding = 0, kernel_size = 1, bias = bias),
+            nn.BatchNorm2d(out_channels), nn.ReLU())
+      else:
+        return nn.Sequential(
+            nn.Conv2d(in_channels = in_channels, out_channels = in_channels, stride = stride, padding = padding, kernel_size = kernel_size, groups=in_channels, bias = bias),
+            nn.Conv2d(in_channels = in_channels , out_channels = out_channels, stride = 1, padding = 0, kernel_size = 1, bias = bias))
+
+    def printf(self, n, x):
+      if(self.printShape):
+        print(f"{n} " f"{x.shape = }") ##  Comment / Uncomment this line towards the no need of print or needed print
+        pass
+    def printEmpty(self,):
+      if(self.printShape):
+        print("") ##  Comment / Uncomment this line towards the no need of print or needed print
+        pass
+
+    def forward(self, x):
+        self.printf(1.0, x)
+        x = self.depsep1(x)
+        self.printf(1.1, x)
+        x = self.depsep2(x)
+        self.printf(1.2, x)
+        x = self.dila1(x)
+        self.printf(1.3, x)
+        x = self.drop(x)
+        x = self.bridge1(x)
+        self.printf(1.4, x)
+
+        self.printEmpty()
+        self.printf(2.0, x)
+        x = self.depsep3(x)
+        self.printf(2.1, x)
+        x = self.depsep4(x)
+        self.printf(2.2, x)
+        x = self.dila2(x)
+        self.printf(2.2, x)
+        # x = self.bridge2(x) #----
+        self.printf(2.3, x)
+        x = self.drop(x)
+        # self.printf(2.4, x)
+
+        self.printEmpty()
+        self.printf(3.0, x)
+        x = self.depsep5(x)
+        self.printf(3.1, x)
+        x = self.depsep6(x)
+        self.printf(3.2, x)
+        x = self.dila3(x)
+        self.printf(3.3, x)
+        # x = self.bridge3(x) #----
+        self.printf(3.3, x)
+        x = self.drop(x)
+        # self.printf(3.4, x)
+
+        self.printEmpty()
+        self.printf(4.0, x)
+        x = self.depsep7(x)
+        self.printf(4.1, x)
+        x = self.depsep8(x)
+        self.printf(4.2, x)
+        x = self.lastConvLayer(x)
+        self.printf(4.3, x)
+        x = self.gap(x)
+        self.printf(5, x)
+        x = x.view(-1, 10)
+        self.printf(6, x)
+        return F.log_softmax(x)
+
+## For S8 of EraV2 - Batch Normalization
+
+class Net_BN_S8(nn.Module):
+    def __init__(self):
+        super(Net_BN_S8, self).__init__()
+        set1 = 16 #channels
+        set2 = 32 #channels
+        out = 10 #channels
+        avg = 5 #channels
+        drop = 0.25 #dropout
+        mom = 0.1
+        self.conv1 = nn.Conv2d(3, set1, 3, padding=1) #first 3 => input channels(R,G,B) last 3 => kernel size (3x3)
+        self.bn1 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv2 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.bn2 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv3 = nn.Conv2d(set1, set1, 1, padding=1)
+        self.bn3 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.pool1 = nn.MaxPool2d(2, 2)
+
+        self.conv4 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.bn4 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv5 = nn.Conv2d(set1, set2, 3, padding=1)
+        self.bn5 = nn.BatchNorm2d(num_features=set2, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv6 = nn.Conv2d(set2, set2, 3)
+        self.bn6 = nn.BatchNorm2d(num_features=set2, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv7 = nn.Conv2d(set2, set2, 1)
+        self.bn7 = nn.BatchNorm2d(num_features=set2, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.pool2 = nn.MaxPool2d(2, 2)
+
+        self.conv8 = nn.Conv2d(set2, set2, 3)
+        self.bn8 = nn.BatchNorm2d(num_features=set2, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv9 = nn.Conv2d(set2, set2, 3)
+        self.bn9 = nn.BatchNorm2d(num_features=set2, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv10 = nn.Conv2d(set2, out, 3)
+        self.bn10 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+
+        self.gap = nn.AvgPool2d(kernel_size=[avg,avg], stride=[avg,avg], padding=0, ceil_mode=False, count_include_pad=False)
+        self.conv11 = nn.Conv2d(out, out, 1)
+
+
+        self.drop = nn.Dropout(drop)
+
+    def forward(self, x):
+        x = self.pool1(self.bn3(F.relu(self.conv3(self.bn2(F.relu(self.conv2(self.bn1(F.relu(self.conv1(x))))))))))
+        x = self.pool2(self.bn7(F.relu(self.conv7(self.bn6(F.relu(self.conv6(self.bn5(F.relu(self.conv5(self.bn4(F.relu(self.conv4(x)))))))))))))
+        x = self.bn10(F.relu(self.conv10(self.bn9(F.relu(self.conv9((self.bn8(F.relu(self.conv8(x))))))))))
+        #print(x.shape)
+        x = self.conv11(x)
+        #print(x.shape)
+        #x = self.gap(x)
+        #print(x.shape)
+        x = x.view(-1, 10) # Raja ToDo Try printing shape here
+        return F.log_softmax(x)
+
+
+## For S8 of EraV2 - Group Normalization
+
+class Net_GN_S8(nn.Module):
+    def __init__(self):
+        super(Net_GN_S8, self).__init__()
+        set1 = 16 #channels
+        set2 = 32 #channels
+        out = 10 #channels
+        avg = 5 #channels
+        drop = 0.25 #dropout
+        mom = 0.1
+        self.conv1 = nn.Conv2d(3, set1, 3, padding=1) #first 3 => input channels(R,G,B) last 3 => kernel size (3x3)
+        self.gn1 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.conv2 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.gn2 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.conv3 = nn.Conv2d(set1, set1, 1, padding=1)
+        self.gn3 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.pool1 = nn.MaxPool2d(2, 2)
+
+        self.conv4 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.gn4 = nn.GroupNorm(num_groups=1, num_channels=set1)
+        self.conv5 = nn.Conv2d(set1, set2, 3, padding=1)
+        self.gn5 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv6 = nn.Conv2d(set2, set2, 3)
+        self.gn6 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv7 = nn.Conv2d(set2, set2, 1)
+        self.gn7 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.pool2 = nn.MaxPool2d(2, 2)
+
+        self.conv8 = nn.Conv2d(set2, set2, 3)
+        self.gn8 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv9 = nn.Conv2d(set2, set2, 3)
+        self.gn9 = nn.GroupNorm(num_groups=1, num_channels=set2)
+        self.conv10 = nn.Conv2d(set2, out, 3)
+        self.gn10 = nn.GroupNorm(num_groups=1, num_channels=out)
+
+        self.gap = nn.AvgPool2d(kernel_size=[avg,avg], stride=[avg,avg], padding=0, ceil_mode=False, count_include_pad=False)
+        self.conv11 = nn.Conv2d(out, out, 1)
+
+
+        self.drop = nn.Dropout(drop)
+
+    def forward(self, x):
+        x = self.pool1(self.gn3(F.relu(self.conv3(self.gn2(F.relu(self.conv2(self.gn1(F.relu(self.conv1(x))))))))))
+        x = self.pool2(self.gn7(F.relu(self.conv7(self.gn6(F.relu(self.conv6(self.gn5(F.relu(self.conv5(self.gn4(F.relu(self.conv4(x)))))))))))))
+        x = self.gn10(F.relu(self.conv10(self.gn9(F.relu(self.conv9((self.gn8(F.relu(self.conv8(x))))))))))
+        #print(x.shape)
+        x = self.conv11(x)
+        #print(x.shape)
+        #x = self.gap(x)
+        #print(x.shape)
+        x = x.view(-1, 10) # Raja ToDo Try printing shape here
+        return F.log_softmax(x)
+
+
+## For S8 of EraV2 - Layer Normalization
+
+class Net_LN_S8(nn.Module):
+    @staticmethod
+    def calc_activation_shape(dim, ksize=(3, 3), dilation=(1, 1), stride=(1, 1), padding=(0, 0)):
+        def shape_each_dim(i):
+            odim_i = dim[i] + 2 * padding[i] - dilation[i] * (ksize[i] - 1) - 1
+            return int((odim_i / stride[i]) + 1)
+        return shape_each_dim(0), shape_each_dim(1)
+
+    #  https://wandb.ai/wandb_fc/LayerNorm/reports/Layer-Normalization-in-Pytorch-With-Examples---VmlldzoxMjk5MTk1
+
+    def __init__(self):
+        super(Net_LN_S8, self).__init__()
+        set1 = 8 #channels
+        set2 = 8 #channels
+        out = 10 #channels
+        avg = 5 #channels
+        drop = 0.25 #dropout
+        mom = 0.1
+        self.conv1 = nn.Conv2d(3, set1, 3, padding=1) #first 3 => input channels(R,G,B) last 3 => kernel size (3x3)
+        ln_shape = self.calc_activation_shape(dim=(32,32), padding=(1, 1))
+        self.ln1 = nn.LayerNorm(normalized_shape=[set1, *ln_shape])
+        self.conv2 = nn.Conv2d(set1, set1, 3)
+        ln_shape = self.calc_activation_shape(dim=(32,32))
+        self.ln2 = nn.LayerNorm(normalized_shape=[set1, *ln_shape])
+        self.conv3 = nn.Conv2d(set1, set1, 1, padding=1)
+        ln_shape = self.calc_activation_shape(dim=(34,34), padding=(1, 1))
+        self.ln3 =  nn.LayerNorm(normalized_shape=[set1, *ln_shape])
+        self.pool1 = nn.MaxPool2d(2, 2)
+
+        self.conv4 = nn.Conv2d(set1, set1, 3, padding=1)
+        ln_shape = self.calc_activation_shape(dim=(16,16), padding=(1, 1))
+        self.ln4 =  nn.LayerNorm(normalized_shape=[set1, *ln_shape])
+        self.conv5 = nn.Conv2d(set1, set2, 3, padding=1)
+        ln_shape = self.calc_activation_shape(dim=(16,16), padding=(1, 1))
+        self.ln5 =  nn.LayerNorm(normalized_shape=[set2, *ln_shape])
+        self.conv6 = nn.Conv2d(set2, set2, 3)
+        ln_shape = self.calc_activation_shape(dim=(16,16))
+        self.ln6 =  nn.LayerNorm(normalized_shape=[set2, *ln_shape])
+        self.conv7 = nn.Conv2d(set2, set2, 1)
+        ln_shape = self.calc_activation_shape(dim=(19,19))
+        self.ln7 =  nn.LayerNorm(normalized_shape=[set2, *ln_shape])
+        self.pool2 = nn.MaxPool2d(2, 2)
+
+        self.conv8 = nn.Conv2d(set2, set2, 3)
+        ln_shape = self.calc_activation_shape(dim=(7,7))
+        self.ln8 =  nn.LayerNorm(normalized_shape=[set2, *ln_shape])
+        self.conv9 = nn.Conv2d(set2, set2, 3)
+        ln_shape = self.calc_activation_shape(dim=(5,5))
+        self.ln9 =  nn.LayerNorm(normalized_shape=[set2, *ln_shape])
+        self.conv10 = nn.Conv2d(set2, out, 3)
+        ln_shape = self.calc_activation_shape(dim=(3,3))
+        self.ln10 =  nn.LayerNorm(normalized_shape=[out, *ln_shape])
+
+        self.gap = nn.AvgPool2d(kernel_size=[avg,avg], stride=[avg,avg], padding=0, ceil_mode=False, count_include_pad=False)
+        self.conv11 = nn.Conv2d(10, out, 1)
+
+
+        self.drop = nn.Dropout(drop)
+
+    def forward(self, x):
+
+        # print(" 1. " + str(x.shape))
+        x = self.ln1(F.relu(self.conv1(x)))
+        # print(" 2. " + str(x.shape))
+        x = self.pool1((F.relu(self.conv3(self.ln2(F.relu(self.conv2(x)))))))
+        # print(" 3. " + str(x.shape))
+        x = self.conv4(x)
+        # print(" 4. " + str(x.shape))
+        x = self.conv5(self.ln4(F.relu(x)))
+        # print(" 5. " + str(x.shape))
+        x = self.ln5(F.relu(x))
+        # print(" 6. " + str(x.shape))
+        x = self.conv7(self.ln6(F.relu(self.conv6(x)))) #ln for conv7 layer is avoided; if ln is provided, the params are tremendously high. May be due to 1x1.
+        # print(" 7. " + str(x.shape))
+        x = self.pool2((F.relu(x)))
+        # print(" 8. " + str(x.shape))
+        x = self.conv8(x)
+        # print(" 9. " + str(x.shape))
+        x = self.conv9((self.ln8(F.relu(x))))
+        # print("10. " + str(x.shape))
+        x = self.conv10(self.ln9(F.relu(x)))
+        # print("11. " + str(x.shape))
+        x = self.ln10(F.relu(x))
+        # print("12. " + str(x.shape))
+        x = self.conv11(x)
+        # print("13. " + str(x.shape))
+        #print(x.shape)
+        #x = self.gap(x)
+        #print(x.shape)
+        x = x.view(-1, 10) # Raja ToDo Try printing shape here
+        return F.log_softmax(x)
+
+
+## This is for S7. Not used though
+
+class Net4(nn.Module):
+    def __init__(self):
+        super(Net4, self).__init__()
+        set1 = 8 #channels
+        set2 = 10 #channels
+        out = 10 #channels
+        avg = 7 #channels
+        drop = 0.3 #dropout
+        mom = 0.1 #momentum in bn
+        self.conv1 = nn.Conv2d(1, set1, 3, padding=1)
+        self.bn1 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv2 = nn.Conv2d(set1, set1, 3, padding=1)
+        self.bn2 = nn.BatchNorm2d(num_features=set1, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.pool1 = nn.MaxPool2d(2, 2)
+        self.conv3 = nn.Conv2d(set1, set2, 3, padding=1)
+        self.bn3 = nn.BatchNorm2d(num_features=set2, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv4 = nn.Conv2d(set2, out, 3, padding=1)
+        self.bn4 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.pool2 = nn.MaxPool2d(2, 2)
+        self.conv5 = nn.Conv2d(out, out, 3, padding=1)
+        self.bn5 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv6 = nn.Conv2d(out, out, 3, padding=1)
+        self.bn6 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.pool3 = nn.MaxPool2d(2, 2)
+        self.conv7 = nn.Conv2d(out, out, 3, padding=1)
+        self.bn7 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv8 = nn.Conv2d(out, out, 3, padding=1)
+        self.bn8 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+        self.conv9 = nn.Conv2d(out, out, 3)
+        self.bn9 = nn.BatchNorm2d(num_features=out, eps=1e-05, momentum=mom, affine=True, track_running_stats=True)
+
+
+        self.drop = nn.Dropout(drop)
+        self.gap = nn.AvgPool2d(kernel_size=[avg,avg], stride=[avg,avg], padding=0, ceil_mode=False, count_include_pad=False)
+
+    def forward(self, x):
+        x = self.drop(self.pool1(self.bn2(F.relu(self.conv2(self.bn1(F.relu(self.conv1(x))))))))
+        x = self.drop(self.pool2(self.bn4(F.relu(self.conv4(self.bn3(F.relu(self.conv3(x))))))))
+        x = self.drop(self.pool3(self.bn6(F.relu(self.conv6(self.bn5(F.relu(self.conv5(x)))))))) # ToDo Try adding MP here
+        x = self.drop(self.bn8(F.relu(self.conv8(self.bn7(F.relu(self.conv7(x))))))) # ToDo Try adding MP here
+        x = self.conv9(x)
+        #x = self.gap(x) # Raja ToDo Try printing shape here
+        #print(x.shape)
+        x = x.view(-1, 10) # Raja ToDo Try printing shape here
+        return F.log_softmax(x)
+
+
+## This is for S5. 
+
+class Net2(nn.Module):
+    #This defines the structure of the NN.
+    def __init__(self):
+        super(Net2, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, bias=False)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, bias=False)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, bias=False)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, bias=False)
+        self.fc1 = nn.Linear(4096, 50, bias=False)
+        self.fc2 = nn.Linear(50, 10, bias=False)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x), 2) # 28>26 | 1>3 | 1>1
+        x = F.relu(F.max_pool2d(self.conv2(x), 2)) #26>24>12 | 3>5>6 | 1>1>2
+        x = F.relu(self.conv3(x), 2) # 12>10 | 6>10 | 2>2
+        x = F.relu(F.max_pool2d(self.conv4(x), 2)) # 10>8>4 | 10>14>16 | 2>2>4
+        x = x.view(-1, 4096) # 4*4*256 = 4096
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return F.log_softmax(x, dim=1)

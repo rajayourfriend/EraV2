@@ -12,6 +12,11 @@ CIFAR10
 
 on the 14 epoch
 
+### Receptive Field of the network 
+
+47
+
+
 ### Accuracy info 
 
 train_cc = 82.94%

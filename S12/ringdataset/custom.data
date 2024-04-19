@@ -1,4 +1,4 @@
   classes=1
   train=data/ringdataset/custom.txt
-  test=data/ringdataset/custom.txt 
+  valid=data/ringdataset/custom.txt 
   names=data/ringdataset/custom.names

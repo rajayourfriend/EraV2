@@ -440,7 +440,7 @@ def compute_loss(p, targets, model):  # predictions, targets, model
 def dump_pred(lbox, lobj, lcls):
   file_path = '/content/pred.txt'
   file_contents = 'box = ' + str(lbox) + '  obj = ' + str(lobj) +' class = ' + str(lcls) + '\n'
-  with open(file_path, "w") as f:
+  with open(file_path, "a") as f:
     f.write(file_contents)
 
 def build_targets(p, targets, model):

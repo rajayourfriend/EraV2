@@ -370,7 +370,7 @@ def smooth_BCE(eps=0.1):  # https://github.com/ultralytics/yolov3/issues/238#iss
 
 
 def compute_loss(p, targets, model):  # predictions, targets, model
-    print("RAJA compute_loss p[0].is_cuda = %s" %(p[0].is_cuda))
+    #print("RAJA compute_loss p[0].is_cuda = %s" %(p[0].is_cuda))
     ft = torch.cuda.FloatTensor if p[0].is_cuda else torch.Tensor
     lcls, lbox, lobj = ft([0]), ft([0]), ft([0])
     tcls, tbox, indices, anchor_vec = build_targets(p, targets, model)
@@ -466,16 +466,16 @@ def build_targets(p, targets, model):
                 t = t.repeat(na, 1)
             else:  # use best anchor only
                 iou, a = iou.max(0)  # best iou and anchor
-            print("RAJA ..." )
+            #print("RAJA ..." )
             # reject anchors below iou_thres (OPTIONAL, increases P, lowers R)
             if reject:
                 #ref : https://github.com/WongKinYiu/yolov7/issues/1101
                 j = torch.zeros_like(iou.view(-1) > model.hyp['iou_t'], device="cpu")  # iou threshold hyperparameter
-                print("j = %s" %((j)))
-                print("j.shape = %s" %((j.shape)))
-                print("j.type = %s" %(type(j)))
-                print("t.type = %s" %(type(t)))
-                print("a.type = %s" %(type(a)))
+                #print("j = %s" %((j)))
+                #print("j.shape = %s" %((j.shape)))
+                #print("j.type = %s" %(type(j)))
+                #print("t.type = %s" %(type(t)))
+                #print("a.type = %s" %(type(a)))
                 t, a = t[j], a[j]
 
         # Indices

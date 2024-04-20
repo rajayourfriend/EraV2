@@ -432,10 +432,16 @@ def compute_loss(p, targets, model):  # predictions, targets, model
         if ng:
             lcls *= 3 / ng / model.nc
             lbox *= 3 / ng
-
+    dump_pred(lbox, lobj, lcls)
     loss = lbox + lobj + lcls
     return loss, torch.cat((lbox, lobj, lcls, loss)).detach()
-
+    
+    
+def dump_pred(lbox, lobj, lcls):
+  file_path = '/content/pred.txt'
+  file_contents = 'box = ' + str(lbox) + '  obj = ' + str(lobj) +' class = ' + str(lcls) + '\n'
+  with open(file_path, "w") as f:
+    f.write(file_contents)
 
 def build_targets(p, targets, model):
     # targets = [image, class, x, y, w, h]

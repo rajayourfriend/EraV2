@@ -32,11 +32,11 @@ train_transform1 = A.Compose([
 
 train_transform2 = A.Compose(
     [
-        A.Normalize(mean=means, std=stds, always_apply=True),
+        A.Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.247, 0.243, 0.261), always_apply=True),
         A.PadIfNeeded(min_height=40, min_width=40, always_apply=True),
         A.RandomCrop(height=32, width=32, always_apply=True),
         A.HorizontalFlip(),
-        A.CoarseDropout(max_holes=1, max_height=8, max_width=8, min_holes=1, min_height=8, min_width=8, fill_value=means),
+        A.CoarseDropout(max_holes=1, max_height=8, max_width=8, min_holes=1, min_height=8, min_width=8, fill_value=[0.4914, 0.4822, 0.4465]),
         ToTensorV2(),
     ]
 )
@@ -83,8 +83,6 @@ train_transform1 = A.Compose([
     ToTensorV2(),
 ])
 
-means = [0.4914, 0.4822, 0.4465]
-stds = [0.2470, 0.2435, 0.2616]
 
 train_transform2 = A.Compose(
     [

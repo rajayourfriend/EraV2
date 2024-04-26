@@ -170,12 +170,12 @@ class Net_S13(nn.Module):
         self.printEmpty()
 
         # x = x.view(-1, 10)
-        self.printf(4.1, x, "For showing before last layer")
+        self.printf(4.2, x, "For showing before last layer")
         x = x.view(x.size(0), -1)
-        self.printf(6.0, x, "last layer input") #512, 1, 1
+        self.printf(5.0, x, "last layer input") #512, 1, 1
         x = self.lastLayer(x)
         # x = self.gap(x)
-        self.printf(6.1, x, "last layer input") #10, 1, 1
+        self.printf(5.1, x, "last layer output") #10, 1, 1
         self.printEmpty()
 
         # self.printf(7.0, x)

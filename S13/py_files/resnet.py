@@ -16,7 +16,7 @@ class Net_S13(nn.Module):
         #super(ResNet, self).__init__()
 
         # Control Variable
-        self.printShape = True
+        self.printShape = False
 
         #Common :-
         set1 = 64 #prepLayer
@@ -133,13 +133,13 @@ class Net_S13(nn.Module):
         self.printf(1.0, x, "Layer1 input")
         x = self.Layer1(x)
         self.printf(1.1, x, "Layer1 output --> sacroscant")
-        y = x #sacrosanct path
+        y = x #sacrosanct path1
         self.printf(1.2, x, "Layer1 resnet input")
-        x = self.resNetLayer1Part1(x)
+        x = self.resNetLayer1Part1(x) #residual path1
         x = self.drop(x)
-        x = self.resNetLayer1Part2(x)
+        x = self.resNetLayer1Part2(x) #residual path1
         self.printf(1.3, x, "Layer1 resnet output")
-        x = x + y
+        x = x + y  #adding sacrosanct path1 and residual path1
         x = self.drop(x)
         self.printf(1.4, x, "res+sacrosanct output")
         self.printEmpty()
@@ -153,13 +153,13 @@ class Net_S13(nn.Module):
         self.printf(3.0, x, "Layer3 input")
         x = self.Layer3(x)
         self.printf(3.1, x, "Layer3 output --> sacroscant")
-        y = x  #sacrosanct path
+        y = x  #sacrosanct path2
         self.printf(3.2, x, "Layer3 resnet input")
-        x = self.resNetLayer2Part1(x)
+        x = self.resNetLayer2Part1(x) #residual path2
         x = self.drop(x)
-        x = self.resNetLayer2Part2(x)
+        x = self.resNetLayer2Part2(x) #residual path2
         self.printf(3.3, x, "Layer3 resnet output")
-        x = x + y
+        x = x + y #adding sacrosanct path2 and residual path2
         x = self.drop(x)
         self.printf(3.4, x, "res+sacrosanct output")
         self.printEmpty()

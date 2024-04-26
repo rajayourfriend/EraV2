@@ -2,10 +2,13 @@
 import numpy as np
 import gradio as gr
 from PIL import Image
+import torch
+import torchvision
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 from torchvision import datasets, transforms, utils
 import math
+import os
 import numpy as np
 import gradio as gr
 from PIL import Image
@@ -13,11 +16,10 @@ import matplotlib.pyplot as plt
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 from torchvision import datasets, transforms, utils
+from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
+from pl_bolts.datamodules import CIFAR10DataModule
 
 
-cifar10_dm.prepare_data()
-cifar10_dm.setup()
-test_loader = cifar10_dm.test_dataloader()
 
 
 def get_misclassified_data2(model, device, test_loader, count):

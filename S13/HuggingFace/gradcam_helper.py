@@ -1,3 +1,8 @@
+import torchvision
+from torchvision import datasets, transforms, utils
+
+import matplotlib.pyplot as plt
+
 # Yes - This is important predecessor3 for gradioMisClassGradCAM
 def display_gradcam_output(data: list,
                            classes: list[str],

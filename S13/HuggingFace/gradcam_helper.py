@@ -10,7 +10,6 @@ import torchvision
 import matplotlib.pyplot as plt
 import torch.nn as nn
 import torch.nn.functional as F
-from IPython.core.display import display
 from pl_bolts.datamodules import CIFAR10DataModule
 from pl_bolts.transforms.dataset_normalizations import cifar10_normalization
 from pytorch_lightning import LightningModule, Trainer, seed_everything

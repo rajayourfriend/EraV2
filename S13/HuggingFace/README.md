@@ -1,3 +1,17 @@
+---
+title: EraV2s13 Raj
+emoji: 📈
+colorFrom: gray
+colorTo: purple
+sdk: gradio
+sdk_version: 4.28.3
+app_file: app.py
+pinned: false
+license: mit
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+
 ## For Assignment 13
 
 
@@ -19,5 +33,3 @@ I integrated above said three items such as gradcam for multiple images, misclas
 
 Fourthly I started working on above working code to modularize it so that few py files will hold major part of code.
 I started working on HuggingFace and created / updated required files and it is made to be in working state in HuggingFace.
-
-

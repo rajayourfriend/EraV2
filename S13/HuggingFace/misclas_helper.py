@@ -25,12 +25,6 @@ from PIL import Image
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
-# Denormalize the data using test mean and std deviation
-inv_normalize = transforms.Normalize(
-    mean=[-0.50/0.23, -0.50/0.23, -0.50/0.23],
-    std=[1/0.23, 1/0.23, 1/0.23]
-)
-
 
 def get_misclassified_data2(model, device, count):
     """

@@ -182,12 +182,12 @@ def classify_images(list_images, model, device):
         # Extract images, labels in a batch
         for image in list_images:
           print("image type = ", type(image))
-          image = resize_image_pil2(image, 32, 32)
-          image = np.asarray(image)
           orig_image = image
           if(image is None):
             pred = -1
           else:
+            image = resize_image_pil2(image, 32, 32)
+            image = np.asarray(image)
             print("numpy image dtype = ", image.dtype)
             image = np.transpose(image, (2, 1, 0))
 

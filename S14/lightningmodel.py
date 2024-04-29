@@ -24,7 +24,7 @@ from torchvision import datasets, transforms, utils
 from PIL import Image
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
-from functools import reduce
+
 
 seed_everything(7)
 
@@ -195,7 +195,7 @@ class Net_S13(nn.Module):
         self.printf(4.2, x, "For showing before last layer")
         x = x.view(x.size(0), -1)
         self.printf(4.3, x, "before computing FCC neurons dynamically")
-        self.lastN = reduce(lambda x, y: x*y, x.size(0))
+        self.lastN = x.size(0)
         self.printf(5.0, x, "last layer input") #512, 1, 1
         x = self.lastLayer(x)
         # x = self.gap(x)

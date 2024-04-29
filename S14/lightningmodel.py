@@ -38,7 +38,7 @@ class Net_S13(nn.Module):
 
         # Control Variable
         self.printShape = True
-        self.lastN = 512 #last neuron number
+        self.lastN = 1 #last neuron number
 
         #Common :-
         set1 = 64 #prepLayer
@@ -112,9 +112,9 @@ class Net_S13(nn.Module):
         O = 10
         self.lastLayer = nn.Linear(I, O)
 
-        self.aGAP = nn.AdaptiveAvgPool2d((1, 1))
-        self.flat = nn.Flatten(1, -1)
-        self.gap = nn.AvgPool2d(avg)
+        # self.aGAP = nn.AdaptiveAvgPool2d((1, 1))
+        # self.flat = nn.Flatten(1, -1)
+        # self.gap = nn.AvgPool2d(avg)
         self.drop = nn.Dropout(drop)
 
     # convolution Block

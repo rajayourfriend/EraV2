@@ -188,8 +188,8 @@ def classify_images(list_images, model, device):
           else:
             print("before resize image shape = ", image.shape)
             image = resize_image_pil2(image, 32, 32)
-            print("after resize image shape = ", image.shape)
             image = np.asarray(image)
+            print("after resize image shape = ", image.shape)
             print("numpy image dtype = ", image.dtype)
             image = np.transpose(image, (2, 1, 0))
 

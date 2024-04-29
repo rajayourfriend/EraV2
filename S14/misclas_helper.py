@@ -133,3 +133,46 @@ def display_cifar_misclassified_data(data: list,
 
 # Plot the misclassified data
 
+
+def classify_images(list_images, model, device):
+    """
+    Function to run the model on test set and return misclassified images
+    :param model: Network Architecture
+    :param device: CPU/GPU
+    :param test_loader: DataLoader for test set
+    """
+
+    # Prepare the model for evaluation i.e. drop the dropout layer
+    model.eval()
+
+    # List to store misclassified Images
+    classified_data = []
+
+    # Reset the gradients
+    with torch.no_grad():
+        # Extract images, labels in a batch
+        for image in list_images:
+          print("image type = ", type(image))
+          orig_image = image
+          if(image is None):
+            pred = -1
+          else:
+            print("numpy image dtype = ", image.dtype)
+            image = np.transpose(image, (2, 1, 0))
+
+            # Add batch dimension to the image
+            image = torch.from_numpy(image).float()
+            print("tensor image dtype = ", image.dtype)
+
+            image = image.unsqueeze(0)
+            print("image shape = ", image.shape)
+
+            # Get the model prediction on the image
+            output = model(image)
+
+            # Convert the output from one-hot encoding to a value
+            pred = output.argmax(dim=1, keepdim=True)
+
+          classified_data.append((orig_image, pred))
+
+    return classified_data

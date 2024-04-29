@@ -134,6 +134,35 @@ def display_cifar_misclassified_data(data: list,
 # Plot the misclassified data
 
 
+def crop_image_pil2(image): #Crop image with 1:1 output aspect ratio
+
+    image = Image.fromarray(image)
+    print("image type = ", type(Image))
+    width, height = image.size
+    if width == height:
+        return image
+    offset  = int(abs(height-width)/2)
+    if width>height:
+        image = image.crop([offset,0,width-offset,height])
+    else:
+        image = image.crop([0,offset,width,height-offset])
+    return image
+
+def resize_image_pil2(image, new_width, new_height):
+    # Convert to PIL image
+    img = crop_image_pil2(image)
+    img = Image.fromarray(np.array(img))
+    # Get original size
+    width, height = img.size
+
+    # Calculate scale
+    width_scale = new_width / width
+    height_scale = new_height / height
+    # Resize
+    resized = img.resize((int(width*width_scale), int(height*height_scale)), Image.NEAREST)
+    # Crop to exact size
+    return resized
+    
 def classify_images(list_images, model, device):
     """
     Function to run the model on test set and return misclassified images
@@ -153,6 +182,7 @@ def classify_images(list_images, model, device):
         # Extract images, labels in a batch
         for image in list_images:
           print("image type = ", type(image))
+          image = resize_image_pil2(image, 32, 32)
           orig_image = image
           if(image is None):
             pred = -1

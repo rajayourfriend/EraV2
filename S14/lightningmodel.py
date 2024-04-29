@@ -243,6 +243,7 @@ class LitResnet(LightningModule):
         self.evaluate(batch, "test")
 
     def configure_optimizers(self):
+        BATCH_SIZE = 256 if torch.cuda.is_available() else 64
         optimizer = torch.optim.SGD(
             self.parameters(),
             lr=self.hparams.lr,

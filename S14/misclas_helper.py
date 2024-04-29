@@ -137,15 +137,15 @@ def display_cifar_misclassified_data(data: list,
 def crop_image_pil2(image): #Crop image with 1:1 output aspect ratio
 
     image = Image.fromarray(image)
-    print("image type = ", type(Image))
+    print("image type = ", type(Image)) 
     width, height = image.size
     if width == height:
         return image
-    offset  = int(abs(height-width)/2)
+    offset  = int(abs(height-width)/2) 
     if width>height:
         image = image.crop([offset,0,width-offset,height])
     else:
-        image = image.crop([0,offset,width,height-offset])
+        image = image.crop([0,offset,width,height-offset]) 
     return image
 
 def resize_image_pil2(image, new_width, new_height):
@@ -156,10 +156,11 @@ def resize_image_pil2(image, new_width, new_height):
     width, height = img.size
 
     # Calculate scale
-    width_scale = new_width / width
-    height_scale = new_height / height
+    width_scale = new_width / width    # RAJA see if this can be deleted
+    height_scale = new_height / height # RAJA see if this can be deleted
     # Resize
-    resized = img.resize((int(width*width_scale), int(height*height_scale)), Image.NEAREST)
+    # resized = img.resize((int(width*width_scale), int(height*height_scale)), Image.NEAREST)
+    resized = img.resize(32, 32), Image.NEAREST)
     # Crop to exact size
     return resized
     

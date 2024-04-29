@@ -38,7 +38,7 @@ class Net_S13(nn.Module):
 
         # Control Variable
         self.printShape = True
-        self.lastN = 1 #last neuron number
+        self.lastN = 512 #last neuron number
 
         #Common :-
         set1 = 64 #prepLayer
@@ -113,7 +113,7 @@ class Net_S13(nn.Module):
         self.lastLayer = nn.Linear(I, O)
 
         # self.aGAP = nn.AdaptiveAvgPool2d((1, 1))
-        # self.flat = nn.Flatten(1, -1)
+        self.flat = nn.Flatten(1, -1)
         # self.gap = nn.AvgPool2d(avg)
         self.drop = nn.Dropout(drop)
 
@@ -192,9 +192,11 @@ class Net_S13(nn.Module):
         self.printEmpty()
 
         # x = x.view(-1, 10)
-        self.printf(4.2, x, "For showing before last layer")
+        self.printf(4.2, x, "before view")
         x = x.view(x.size(0), -1)
-        self.printf(4.3, x, "before computing FCC neurons dynamically")
+        self.printf(4.3, x, "before flatten")
+        x = self.flat(x)
+        self.printf(4.4, x, "before computing FCC neurons dynamically")
         self.lastN = x.size(0)
         self.printf(5.0, x, "last layer input") #512, 1, 1
         x = self.lastLayer(x)

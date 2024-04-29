@@ -183,7 +183,7 @@ def classify_images(list_images, model, device):
         for image in list_images:
           print("image type = ", type(image))
           image = resize_image_pil2(image, 32, 32)
-          image = numpy.asarray(image)
+          image = np.asarray(image)
           orig_image = image
           if(image is None):
             pred = -1

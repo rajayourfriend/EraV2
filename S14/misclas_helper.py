@@ -181,12 +181,14 @@ def classify_images(list_images, model, device):
     with torch.no_grad():
         # Extract images, labels in a batch
         for image in list_images:
-          print("image type = ", type(image))
+          # print("image type = ", type(image))
           orig_image = image
           if(image is None):
             pred = -1
           else:
+            print("before resize image shape = ", image.shape)
             image = resize_image_pil2(image, 32, 32)
+            print("after resize image shape = ", image.shape)
             image = np.asarray(image)
             print("numpy image dtype = ", image.dtype)
             image = np.transpose(image, (2, 1, 0))
@@ -196,7 +198,7 @@ def classify_images(list_images, model, device):
             print("tensor image dtype = ", image.dtype)
 
             image = image.unsqueeze(0)
-            print("image shape = ", image.shape)
+            print("after squeeze image shape = ", image.shape)
 
             # Get the model prediction on the image
             output = model(image)

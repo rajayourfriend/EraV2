@@ -37,7 +37,7 @@ class Net_S13(nn.Module):
         #super(ResNet, self).__init__()
 
         # Control Variable
-        self.printShape = True
+        self.printShape = False
 
         #Common :-
         set1 = 64 #prepLayer

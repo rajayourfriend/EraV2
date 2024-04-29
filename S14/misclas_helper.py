@@ -187,19 +187,19 @@ def classify_images(list_images, model, device):
           if(image is None):
             pred = 10 #This entry indicates none in classes, empty string
           else:
-            print("before resize image shape = ", image.shape)
+            #print("before resize image shape = ", image.shape)
             image = resize_image_pil2(image, 32, 32)
             image = np.asarray(image)
-            print("after resize image shape = ", image.shape)
-            print("numpy image dtype = ", image.dtype)
+            #print("after resize image shape = ", image.shape)
+            #print("numpy image dtype = ", image.dtype)
             image = np.transpose(image, (2, 1, 0))
 
             # Add batch dimension to the image
             image = torch.from_numpy(image).float()
-            print("tensor image dtype = ", image.dtype)
+            #print("tensor image dtype = ", image.dtype)
 
             image = image.unsqueeze(0)
-            print("after squeeze image shape = ", image.shape)
+            #print("after squeeze image shape = ", image.shape)
 
             # Get the model prediction on the image
             output = model(image)

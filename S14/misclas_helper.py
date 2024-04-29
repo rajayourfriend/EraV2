@@ -160,7 +160,7 @@ def resize_image_pil2(image, new_width, new_height):
     height_scale = new_height / height # RAJA see if this can be deleted
     # Resize
     # resized = img.resize((int(width*width_scale), int(height*height_scale)), Image.NEAREST)
-    resized = img.resize(32, 32), Image.NEAREST)
+    resized = img.resize((32, 32), Image.NEAREST)
     # Crop to exact size
     return resized
     
@@ -185,7 +185,7 @@ def classify_images(list_images, model, device):
           # print("image type = ", type(image))
           orig_image = image
           if(image is None):
-            pred = -1
+            pred = 10 #This entry indicates none in classes, empty string
           else:
             print("before resize image shape = ", image.shape)
             image = resize_image_pil2(image, 32, 32)

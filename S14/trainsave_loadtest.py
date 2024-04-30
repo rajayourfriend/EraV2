@@ -98,4 +98,4 @@ def ts_lt( # Train and Save Vs Load and Test
 
     trainer.test(model, datamodule=cifar10_dm)
     
-    return (device, model, trainer)
+    return model, trainer

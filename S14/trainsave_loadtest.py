@@ -97,3 +97,4 @@ def ts_lt( # Train and Save Vs Load and Test
       )
       trainer.fit(model, cifar10_dm)
     trainer.test(model, datamodule=cifar10_dm)
+    return trainer

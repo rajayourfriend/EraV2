@@ -85,9 +85,6 @@ def ts_lt( # Train and Save Vs Load and Test
 
     if save1_or_load0 == True:
       model = LitResnet(lr=0.05)
-    else:
-      model = LitResnet(lr=0.05).load_from_checkpoint(wt_fname)
-
       checkpoint_callback = ModelCheckpoint(
         monitor='val_acc',
         dirpath='/content/',
@@ -96,5 +93,9 @@ def ts_lt( # Train and Save Vs Load and Test
         mode='max',
       )
       trainer.fit(model, cifar10_dm)
+    else:
+      model = LitResnet(lr=0.05).load_from_checkpoint(wt_fname)
+
     trainer.test(model, datamodule=cifar10_dm)
+    
     return trainer

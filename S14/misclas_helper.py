@@ -172,9 +172,14 @@ def classify_images(list_images, model, device):
     :param test_loader: DataLoader for test set
     """
 
+    test_transforms = torchvision.transforms.Compose(
+        [
+            torchvision.transforms.ToTensor(),
+            cifar10_normalization(),
+        ]
+    )
     # Prepare the model for evaluation i.e. drop the dropout layer
     model.eval()
-
     # List to store misclassified Images
     classified_data = []
 
@@ -192,7 +197,7 @@ def classify_images(list_images, model, device):
             image = np.asarray(image)
             #print("after resize image shape = ", image.shape)
             #print("numpy image dtype = ", image.dtype)
-            image = np.transpose(image, (2, 1, 0))
+            # image = np.transpose(image, (2, 1, 0))
 
             # Add batch dimension to the image
             image = torch.from_numpy(image).float()

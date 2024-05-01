@@ -25,6 +25,11 @@ from PIL import Image
 from pytorch_grad_cam import GradCAM
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
+inv_normalize = transforms.Normalize(
+  mean=[-0.50/0.23, -0.50/0.23, -0.50/0.23],
+  std=[1/0.23, 1/0.23, 1/0.23]
+)
+
 
 def get_misclassified_data2(model, device, count):
     """
@@ -187,26 +192,21 @@ def classify_images(list_images, model, device):
     with torch.no_grad():
         # Extract images, labels in a batch
         for image in list_images:
-          print("image type = ", type(image))
+          #print("image type = ", type(image))
           orig_image = image
           if(image is None):
             pred = 10 #This entry indicates none in classes, empty string
           else:
-            print("before resize image shape = ", image.shape)
+            #print("before resize image shape = ", image.shape)
             image = resize_image_pil2(image, 32, 32)
-            #print("after resize image shape = ", image.shape)
             image = np.asarray(image)
-            print("numpy image dtype = ", image.dtype)
-            print("before test_transforms image shape = ", image.shape)
+            #print("numpy image dtype = ", image.dtype)
+            #print("before test_transforms image shape = ", image.shape)
             image = test_transforms(image)
-            print("after test_transforms image shape = ", image.shape)
-            print("before transpose image shape = ", image.shape)
-            #image = np.transpose(image, (0, 1, 2))
-            print("after transpose image shape = ", image.shape)
-            #image = torch.from_numpy(image).float()
+            #print("after test_transforms image shape = ", image.shape)
 
             image = image.unsqueeze(0)
-            print("after squeeze image shape = ", image.shape)
+            #print("after squeeze image shape = ", image.shape)
 
             # Get the model prediction on the image
             output = model(image)

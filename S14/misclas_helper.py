@@ -198,12 +198,12 @@ def classify_images(list_images, model, device):
             #print("after resize image shape = ", image.shape)
             #print("numpy image dtype = ", image.dtype)
             image = np.transpose(image, (2, 1, 0))
-
+            image = transform(img)
             # Add batch dimension to the image
             image = torch.from_numpy(image).float()
             #print("tensor image dtype = ", image.dtype)
 
-            #image = image.unsqueeze(0)
+            image = image.unsqueeze(0)
             #print("after squeeze image shape = ", image.shape)
 
             # Get the model prediction on the image

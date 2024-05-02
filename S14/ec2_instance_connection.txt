@@ -1,0 +1,4 @@
+ec2 instance : i-0bfd9f020f8d005f7
+Public DNS : ec2-65-0-73-11.ap-south-1.compute.amazonaws.com
+Ssh Command : ssh -i "erav2r1.pem" ubuntu@ec2-65-0-73-11.ap-south-1.compute.amazonaws.com
+IdentityFile : C:\Users\rrpalani\Documents\GitHub\EraV2\S14\erav2r1.pem

@@ -38,11 +38,11 @@ inv_normalize = transforms.Normalize(
 def ts_lt( # Train and Save Vs Load and Test
           save1_or_load0, # decision maker for training Vs testing
           Epochs = 1, # argument for training
-          wt_fname = "/content/weights.ckpt" # argument for testing
+          wt_fname = "/home/ubuntu/S14/weights.ckpt" # argument for testing
           ): 
     checkpoint_callback = ModelCheckpoint(
         monitor='val_acc',
-        dirpath='/content/',
+        dirpath='/home/ubuntu/S14/',
         filename='weights_{epoch:02d}_{val_acc:.2f}',
         save_top_k=3,
         mode='max',

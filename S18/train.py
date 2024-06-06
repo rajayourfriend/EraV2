@@ -23,6 +23,7 @@ from tokenizers.pre_tokenizers import Whitespace
 
 import torchmetrics
 from torch.utils.tensorboard import SummaryWriter
+import time
 
 torch.cuda.empty_cache()
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:12240"
@@ -207,6 +208,7 @@ def train_model(config):
         model.train()
         batch_iterator = tqdm(train_dataloader, desc = f"Processing Epoch {epoch:02d}")
         
+        start = time.time()
         for batch in batch_iterator:
             encoder_input = batch["encoder_input"].to(device)
             decoder_input = batch["decoder_input"].to(device)
@@ -235,9 +237,12 @@ def train_model(config):
             optimizer.step()
             optimizer.zero_grad(set_to_none=True)
             global_step+=1
-            #print("Breaking here at the end of an iterator. Remove break, for complete run")
-            print("At the end of an iterator.")
-            #break
+            print("Breaking here at the end of an iterator. Remove break, for complete run")
+            #print("At the end of an iterator.")
+            break
+        end = time.time()
+        print("time taken for an iteration = %s seconds" % (end - start))
+    
             
         #run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, writer, global_step)
         

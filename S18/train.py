@@ -238,7 +238,7 @@ def train_model(config):
             optimizer.step()
             optimizer.zero_grad(set_to_none=True)
             global_step+=1
-            counter ++
+            counter += 1
             print("At the end of an iteration.")
             if(counter == 10):
                 print("Breaking here at the end of 10 iterations. Remove break, for complete run")

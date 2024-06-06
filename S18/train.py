@@ -27,7 +27,7 @@ from tokenizers.models import WordLevel
 from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
 
-#torch.cuda.amp.autocast(enabled = True) # This is already present in ipynb file
+torch.cuda.amp.autocast(enabled = True) # This is already present in ipynb file
 
 torch.cuda.empty_cache()
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:12240"

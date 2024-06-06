@@ -22,9 +22,9 @@ class BilingualDataset(Dataset):
         return len(self.ds)
     
     def __getitem__(self, idx):
-        src_target_pair = self.ds[idx]
-        src_text = src_target_pair['translation'][self.src_lang]
-        tgt_text = src_target_pair['translation'][self.tgt_lang]
+        src_tgt_pair = self.ds[idx]
+        src_text = src_tgt_pair['translation'][self.src_lang]
+        tgt_text = src_tgt_pair['translation'][self.tgt_lang]
         
         # Transform the text into tokens
         enc_input_tokens = self.tokenizer_src.encode(src_text).ids
@@ -37,7 +37,7 @@ class BilingualDataset(Dataset):
         
         #Make sure that padding is not negative, if it is the sentance is too long)
         if enc_num_padding_tokens < 0 or dec_num_padding_tokens < 0:
-            raise ValueError("Sentence is too long")
+            raise ValueError("Sentence too long")
             
         # Add <s> and </s> token
         encoder_input = torch.cat(
@@ -82,9 +82,7 @@ class BilingualDataset(Dataset):
             "decoder_mask": (decoder_input != self.pad_token).unsqueeze(0).int() & casual_mask(decoder_input.size(0)),  # (1, seq_len) and (1, seq_len, seq_len)   # Will get 0 for all pads. And 0 for earlier text.
             "label": label,  # (seq_len)
             "src_text": src_text,
-            "tgt_text": tgt_text,
-            "encoder_str_length": len(enc_input_tokens),
-            "decoder_str_length": len(dec_input_tokens)
+            "tgt_text": tgt_text
             }
     
 def casual_mask(size):

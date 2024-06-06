@@ -6,24 +6,16 @@ import torchtext.datasets as datasets
 import torch
 torch.cuda.amp.autocast(enabled = True)
 
-import torch.nn as nn
+
 from torch.utils.data import Dataset, DataLoader, random_split
 from torch.optim.lr_scheduler import LambdaLR
 
-import warnings
-from tqdm import tqdm
-import os
-from pathlib import Path
 
 from datasets import load_dataset
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
-
-import torchmetrics
-from torch.utils.tensorboard import SummaryWriter
-import time
 
 torch.cuda.empty_cache()
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:12240"
@@ -172,97 +164,6 @@ def get_model(config, src_vocab_size, tgt_vocab_size):
     return model
 
 
-def train_model(config):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device : {device}")
-    
-    Path(config["model_folder"]).mkdir(parents=True, exist_ok=True)
-    train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt = get_ds(config)
-    model = get_model(config, tokenizer_src.get_vocab_size(), tokenizer_tgt.get_vocab_size()).to(device)
-    
-    #Tensorboard
-    writer = SummaryWriter(config["experiment_name"])
-    
-    #Adam is used to train each feature with a different learning rate. 
-    #If some feature is appearing less, adam takes care of it
-    optimizer = torch.optim.Adam(model.parameters(), lr = config["lr"], eps = 1e-9)
-    
-    initial_epoch = 0
-    global_step = 0
-    
-    if config["preload"]:
-        model_filename = get_weights_file_path(config, config["preload"])
-        print("Preloading model {model_filename}")
-        state = torch.load(model_filename)
-        model.load_state_dict(state["model_state_dict"])
-        initial_epoch = state["epoch"] + 1
-        optimizer.load_state_dict(state["optimizer_state_dict"])
-        global_step = state["global_step"]
-        print("preloaded")
-        
-    loss_fn = nn.CrossEntropyLoss(ignore_index = tokenizer_src.token_to_id("[PAD]"), label_smoothing=0.1)
-    
-    for epoch in range(initial_epoch, config["num_epochs"]):
-        torch.cuda.empty_cache()
-        print(epoch)
-        model.train()
-        batch_iterator = tqdm(train_dataloader, desc = f"Processing Epoch {epoch:02d}")
-        
-        start = time.time()
-        counter = 1
-        for batch in batch_iterator:
-            encoder_input = batch["encoder_input"].to(device)
-            decoder_input = batch["decoder_input"].to(device)
-            encoder_mask = batch["encoder_mask"].to(device)
-            decoder_mask = batch["decoder_mask"].to(device)
-            
-            encoder_output = model.encode(encoder_input, encoder_mask)
-            decoder_output = model.decode(encoder_output, encoder_mask, decoder_input, decoder_mask)
-            proj_output = model.project(decoder_output)
-            
-            label = batch["label"].to(device)
-            
-            #Compute loss using cross entropy
-            tgt_vocab_size = tokenizer_tgt.get_vocab_size()
-            loss = loss_fn(proj_output.view(-1, tgt_vocab_size), label.view(-1))
-            batch_iterator.set_postfix({"loss": f"{loss.item():6.3f}"})
-
-            #Log the loss
-            writer.add_scalar('train_loss', loss.item(), global_step)
-            writer.flush()
-            
-            #Backpropogate loss
-            loss.backward()
-            
-            #Update weights
-            optimizer.step()
-            optimizer.zero_grad(set_to_none=True)
-            global_step+=1
-            counter += 1
-            print("At the end of an iteration.")
-            if(counter == 20):
-                print("Breaking here at the end of %   iterations. Remove break, for complete run" % counter)
-                break
-            
-        #run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, writer, global_step)
-        
-
-        end = time.time()
-        print("time taken for an iteration = %s seconds" % (end - start))
-        
-        model_filename = get_weights_file_path(config, f"{epoch:02d}")
-        torch.save(
-            {
-                "epoch": epoch,
-                "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict(),
-                "global_step": global_step
-            },
-            model_filename
-        )
-        
-
-        
             
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")

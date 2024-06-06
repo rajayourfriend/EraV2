@@ -240,7 +240,7 @@ def train_model(config):
             global_step+=1
             counter += 1
             print("At the end of an iteration.")
-            if(counter == 10):
+            if(counter == 20):
                 print("Breaking here at the end of 10 iterations. Remove break, for complete run")
                 break
             

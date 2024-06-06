@@ -235,6 +235,8 @@ def train_model(config):
             optimizer.step()
             optimizer.zero_grad(set_to_none=True)
             global_step+=1
+            print("Breaking here at the end of an iterator. Remove break, for complete run")
+            break
             
         #run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, writer, global_step)
         

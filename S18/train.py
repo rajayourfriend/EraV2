@@ -1,5 +1,5 @@
 from model import build_transformer
-from dataset import BillingualDataset, casual_mask
+from dataset import BilingualDataset, casual_mask
 from config_file import get_config, get_weights_file_path
 
 import torchtext.datasets as datasets
@@ -138,8 +138,8 @@ def get_ds(config):
     val_ds_size = len(ds_raw) - train_ds_size
     train_ds_raw, val_ds_raw = random_split(ds_raw, [train_ds_size, val_ds_size])
     
-    train_ds = BillingualDataset(train_ds_raw, tokenizer_src, tokenizer_tgt, src_lang, tgt_lang, seq_len)
-    val_ds = BillingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt, src_lang, tgt_lang, seq_len)
+    train_ds = BilingualDataset(train_ds_raw, tokenizer_src, tokenizer_tgt, src_lang, tgt_lang, seq_len)
+    val_ds = BilingualDataset(val_ds_raw, tokenizer_src, tokenizer_tgt, src_lang, tgt_lang, seq_len)
     
     max_len_src = 0
     max_len_tgt = 0

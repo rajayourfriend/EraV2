@@ -2,9 +2,20 @@ from model import build_transformer
 from dataset import BilingualDataset, casual_mask
 from config_file import get_config, get_weights_file_path
 
+import warnings
+from tqdm import tqdm
+import os
+from pathlib import Path
+
+import torchmetrics
+from torch.utils.tensorboard import SummaryWriter
+import time
+
+import torch.nn as nn
+
 import torchtext.datasets as datasets
 import torch
-torch.cuda.amp.autocast(enabled = True)
+
 
 
 from torch.utils.data import Dataset, DataLoader, random_split
@@ -16,6 +27,8 @@ from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
 from tokenizers.trainers import WordLevelTrainer
 from tokenizers.pre_tokenizers import Whitespace
+
+#torch.cuda.amp.autocast(enabled = True) # This is already present in ipynb file
 
 torch.cuda.empty_cache()
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:12240"

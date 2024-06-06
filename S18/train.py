@@ -209,6 +209,7 @@ def train_model(config):
         batch_iterator = tqdm(train_dataloader, desc = f"Processing Epoch {epoch:02d}")
         
         start = time.time()
+        counter = 1
         for batch in batch_iterator:
             encoder_input = batch["encoder_input"].to(device)
             decoder_input = batch["decoder_input"].to(device)
@@ -237,15 +238,17 @@ def train_model(config):
             optimizer.step()
             optimizer.zero_grad(set_to_none=True)
             global_step+=1
-            print("Breaking here at the end of an iterator. Remove break, for complete run")
-            #print("At the end of an iterator.")
-            break
-        end = time.time()
-        print("time taken for an iteration = %s seconds" % (end - start))
-    
+            counter ++
+            print("At the end of an iteration.")
+            if(counter == 10):
+                print("Breaking here at the end of 10 iterations. Remove break, for complete run")
+                break
             
         #run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, writer, global_step)
         
+
+        end = time.time()
+        print("time taken for an iteration = %s seconds" % (end - start))
         
         model_filename = get_weights_file_path(config, f"{epoch:02d}")
         torch.save(
@@ -257,6 +260,8 @@ def train_model(config):
             },
             model_filename
         )
+        
+
         
             
 if __name__ == "__main__":

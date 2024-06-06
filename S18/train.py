@@ -241,7 +241,7 @@ def train_model(config):
             counter += 1
             print("At the end of an iteration.")
             if(counter == 20):
-                print("Breaking here at the end of 10 iterations. Remove break, for complete run")
+                print("Breaking here at the end of % iterations. Remove break, for complete run" % counter)
                 break
             
         #run_validation(model, val_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, writer, global_step)

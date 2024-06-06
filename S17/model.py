@@ -84,6 +84,7 @@ class MultiHeadAttentionBlock(nn.Module):
     
   @staticmethod
   def attention(query, key, value, mask, dropout: nn.Dropout):
+    print("Start of function attention ...")
     d_k = query.shape[-1]
     attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
     print(f"type(attention_scores) = {type(attention_scores)}")

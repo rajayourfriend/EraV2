@@ -86,7 +86,7 @@ class MultiHeadAttentionBlock(nn.Module):
   def attention(query, key, value, mask, dropout: nn.Dropout):
     d_k = query.shape[-1]
     attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
-    print(f"type(attention_scores) = {type(attention_scores)}")
+    print(f"type(attention_scores) = {(attention_scores.dtype)}")
     if mask is not None:
       attention_scores.masked_fill_(mask == 0, -1e9)
     attention_scores = attention_scores.softmax(dim=-1)

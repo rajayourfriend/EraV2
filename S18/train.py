@@ -12,16 +12,15 @@ from torch.utils.tensorboard import SummaryWriter
 import time
 
 import torch.nn as nn
-
-import torchtext.datasets as datasets
 import torch
+
 
 
 
 from torch.utils.data import Dataset, DataLoader, random_split
 from torch.optim.lr_scheduler import LambdaLR
 
-
+import torchtext.datasets as datasets
 from datasets import load_dataset
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel

@@ -188,7 +188,8 @@ def collate_fn(batch):
         decoder_inputs.append(b["decoder_input"][:decoder_input_max])
         encoder_mask.append((b["encoder_mask"][0, 0, :encoder_input_max]).unsqueeze(0).unsqueeze(0).unsqueeze(0).int())
         decoder_mask.append((b["decoder_mask"][0, :decoder_input_max, :decoder_input_max]).unsqueeze(0).unsqueeze(0))
-        label.append(b["src_text"])
+        label.append(b["label"][:decoder_input_max])
+        src_text.append(b["src_text"])
         tgt_text.append(b["tgt_text"])
     return {
         "encoder_input":torch.vstack(encoder_inputs),

@@ -171,7 +171,7 @@ def get_ds(config):
     return train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt
 
 
-def collate_fn():
+def collate_fn(batch):
     encoder_input_max = max(x["encoder_str_length"] for x in batch)
     decoder_input_max = max(x["decoder_str_length"] for x in batch)
     

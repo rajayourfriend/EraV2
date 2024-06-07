@@ -165,10 +165,40 @@ def get_ds(config):
     print(f"Max length of the source sentence : {max_len_src}")
     print(f"Max length of the source target : {max_len_tgt}")
     
-    train_dataloader = DataLoader(train_ds, batch_size = config["batch_size"], shuffle = True)
+    train_dataloader = DataLoader(train_ds, batch_size = config["batch_size"], shuffle = True, collate_fn=collate_fn)
     val_dataloader = DataLoader(val_ds, batch_size = 1, shuffle = True)
     
     return train_dataloader, val_dataloader, tokenizer_src, tokenizer_tgt
+
+
+def collate_fn():
+    encoder_input_max = max(x["encoder_str_length"] for x in batch)
+    decoder_input_max = max(x["decoder_str_length"] for x in batch)
+    
+    encoder_inputs = []
+    decoder_inputs = []
+    encoder_mask = []
+    decoder_mask = []
+    label = []
+    src_text = []
+    tgt_text = []
+    
+    for b in batch:
+        encoder_inputs.append(b["encoder_input"][:encoder_input_max])
+        decoder_inputs.append(b["decoder_input"][:decoder_input_max])
+        encoder_mask.append((b["encoder_mask"][0, 0, :encoder_input_max]).unsqueeze(0).unsqueeze(0).unsqueeze(0).int())
+        decoder_mask.append((b["decoder_mask"][0, :decoder_input_max, :decoder_input_max]).unsqueeze(0).unsqueeze(0))
+        label.append(b["src_text"])
+        tgt_text.append(b["tgt_text"])
+    return {
+        "encoder_input":torch.vstack(encoder_inputs),
+        "decoder_input":torch.vstack(decoder_inputs),
+        "encoder_mask":torch.vstack(encoder_mask),
+        "decoder_mask":torch.vstack(decoder_mask),
+        "label":torch.vstack(label),
+        "src_text":src_text,
+        "tgt_text":tgt_text
+    }
 
 
 def get_model(config, src_vocab_size, tgt_vocab_size):

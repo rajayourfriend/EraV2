@@ -470,10 +470,6 @@ def GPT():
   # create a PyTorch optimizer
   optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
   
-  !git clone https://github.com/rajayourfriend/EraV2/
-  !cp EraV2/S19/*.* .
-  
-  
   m.load_state_dict(torch.load('wt_5k.pth', map_location=torch.device(device)))
   
   # generate from the model

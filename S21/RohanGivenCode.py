@@ -264,7 +264,7 @@ def train_the_model(train_loader):
 
 
 #From here inference
-def infer_the_model(device, test_loader, save1_or_load0, max_length):
+def infer_the_model(device, test_loader, save1_or_load0, max_length, num_return_sequences):
     x, y = test_loader.next_batch()
     model = get_model(device)
     if save1_or_load0 == 0:
